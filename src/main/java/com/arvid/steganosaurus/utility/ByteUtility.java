@@ -27,7 +27,10 @@ public class ByteUtility {
         return strings.stream().map(e -> (char) Integer.parseInt(e, 2)).collect(toCollection(ArrayList::new));
     }
 
-    public static byte[] encode(byte[] in, byte[] dest, final int K_LSB) {
+    public static byte[] encode(byte[] in, byte[] dest, int offset_in, int offset_dest, final int K_LSB) throws Exception {
+        if(((K_LSB * in.length) + offset_in) > dest.length - offset_dest){
+            throw new Exception("Destination data too small to contain input data");
+        }
         byte[] result = new byte[dest.length];
         System.arraycopy(dest, 0, result, 0, dest.length);
         char[] toHide = new String(in, StandardCharsets.UTF_8).toCharArray();
@@ -53,7 +56,7 @@ public class ByteUtility {
         return b << -k >>> -k;
     }
 
-    public static List<Character> decode(byte[] data, final int K_LSB) {
+    public static List<Character> decode(byte[] data, int offset, final int K_LSB) {
         List<Integer> lsbs = new ArrayList<>();
         for (byte b : data) {
             int lsb = getLSB(b, K_LSB);

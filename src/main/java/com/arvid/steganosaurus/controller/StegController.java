@@ -2,7 +2,9 @@ package com.arvid.steganosaurus.controller;
 
 
 import com.arvid.steganosaurus.utility.ByteUtility;
+import com.arvid.steganosaurus.utility.FileUtility;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.tika.exception.UnsupportedFormatException;
 import org.springframework.context.annotation.Bean;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestPart;
@@ -26,15 +28,14 @@ import java.util.stream.Collectors;
 public class StegController {
 
     @PostMapping("/file")
-    public String fileUpload(@RequestPart(value = "file") MultipartFile file) throws IOException {
+    public String fileUpload(@RequestPart(value = "file") MultipartFile file) throws IOException, UnsupportedFormatException {
         InputStream inputStream = new ByteArrayInputStream(file.getBytes());
         BufferedImage img = ImageIO.read(inputStream);
         WritableRaster raster = img.getRaster();
         DataBufferByte bufferByte = (DataBufferByte) raster.getDataBuffer();
-        List<Character> chars = ByteUtility.decode(bufferByte.getData(), 1);
-        log.info("LSB 1: {}", chars.stream().map(String::valueOf).collect(Collectors.joining()));
-        chars = ByteUtility.decode(bufferByte.getData(), 2);
-        log.info("LSB 2: {}", chars.stream().map(String::valueOf).collect(Collectors.joining()));
+        int offset = FileUtility.getOffset(inputStream);
+        List<Character> chars = ByteUtility.decode(bufferByte.getData(), offset, 1);
+        log.info("Decoded: {}", chars.stream().map(String::valueOf).collect(Collectors.joining()));
         return Arrays.toString(file.getBytes());
     }
 
