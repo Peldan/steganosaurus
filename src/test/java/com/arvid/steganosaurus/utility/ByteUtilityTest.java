@@ -79,15 +79,15 @@ public class ByteUtilityTest {
     }
 
     @Test
-    public void testEncode() throws Exception {
+    public void testEncodeWithOffset() throws Exception {
         Random r = new Random();
         String alphabet = "abcdefghixyz";
-        byte[] before = new byte[24];
+        byte[] before = new byte[25];
         for(int i = 0; i < before.length; i++){
             before[i] = (byte) alphabet.charAt(r.nextInt(alphabet.length()));
         }
-        byte[] encoded = ByteUtility.encode("LOL".getBytes(), before, 0, 0, 1);
-        Assertions.assertEquals("LOL", ByteUtility.decode(encoded, 0,1).stream().map(String::valueOf).collect(Collectors.joining()));
+        byte[] encoded = ByteUtility.encode("LOL".getBytes(), before, 1, 0, 1);
+        Assertions.assertEquals("LOL", ByteUtility.decode(encoded, 1,1).stream().map(String::valueOf).collect(Collectors.joining()));
     }
 
     @Test

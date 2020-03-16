@@ -34,19 +34,17 @@ public class ByteUtility {
         byte[] result = new byte[dest.length];
         System.arraycopy(dest, 0, result, 0, dest.length);
         char[] toHide = new String(in, StandardCharsets.UTF_8).toCharArray();
-        int byteNo = 0;
         for (char c : toHide) {
             byte curr = (byte) c;
             char[] bits = ByteUtility.getBits(curr);
             for (char bit : bits) {
-                byte toInsertInto = dest[byteNo];
+                byte toInsertInto = dest[offset_dest++];
                 int inserted = toInsertInto;
                 int lsb = ByteUtility.getLSB(toInsertInto, K_LSB);
                 if (lsb != bit) {
                     inserted = (lsb & ~1) | bit;
                 }
-                result[byteNo] = (byte) inserted;
-                byteNo++;
+                result[offset_in++] = (byte) inserted;
             }
         }
         return result;
@@ -58,8 +56,8 @@ public class ByteUtility {
 
     public static List<Character> decode(byte[] data, int offset, final int K_LSB) {
         List<Integer> lsbs = new ArrayList<>();
-        for (byte b : data) {
-            int lsb = getLSB(b, K_LSB);
+        for (int i = offset; i < data.length; i++){
+            int lsb = getLSB(data[i], K_LSB);
             lsbs.add(lsb);
         }
         return new ArrayList<>(toAscii(lsbs));
